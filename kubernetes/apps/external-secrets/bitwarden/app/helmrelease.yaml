@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app bitwarden
+spec:
+  interval: 5m
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  values:
+    controllers:
+      bitwarden:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/roxedus/bw
+              tag: 2025.9.0@sha256:dbb0a965ddf57c78ab550f262b0fa90bfccd96439af87d659387897596882200
+            command:
+              - /bin/sh
+              - -c
+            # NOTE: Needed to insert a custom entrypoint here because the existing entrypoint.sh has a strong assumption that
+            # you use just username/password auth, which we can't do because we require 2FA (i.e. OTP).
+            # Original entrypoint here: https://external-secrets.io/v0.8.5/examples/bitwarden/
+            args:
+              - |
+                bw config server ${BW_HOST}
+
+                BW_CLIENTID=${BW_CLIENTID} BW_CLIENTSECRET=${BW_CLIENTSECRET} bw login --apikey
+
+                export BW_SESSION=$(bw unlock ${BW_PASSWORD} --raw)
+
+                bw unlock --check
+
+                echo 'Running `bw server` on port 8087'
+                bw serve --hostname 0.0.0.0
+            envFrom:
+              - secretRef:
+                  name: bitwarden-cli
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - sh
+                      - -c
+                      - /healthcheck.sh
+                  initialDelaySeconds: 20
+                  failureThreshold: 5
+                  timeoutSeconds: 3
+                  periodSeconds: 240
+            resources:
+              requests:
+                memory: 256Mi
+                cpu: 100m
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 8087
