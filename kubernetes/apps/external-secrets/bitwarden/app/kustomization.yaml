@@ -6,4 +6,3 @@ resources:
   - ./clustersecretstore.yaml
   - ./bitwarden-secrets.sops.yaml
   - ./helmrelease.yaml
-  - ./ocirepository.yaml

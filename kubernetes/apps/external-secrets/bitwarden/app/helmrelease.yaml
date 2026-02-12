@@ -1,74 +1,73 @@
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app bitwarden
+  name: &app bitwarden-secrets-manager
 spec:
-  interval: 5m
-  chartRef:
-    kind: OCIRepository
-    name: bitwarden
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
   values:
     controllers:
-      bitwarden:
+      bitwarden-secrets-manager:
+        replicas: 1
+        strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              repository: ghcr.io/roxedus/bw
-              tag: 2025.9.0@sha256:dbb0a965ddf57c78ab550f262b0fa90bfccd96439af87d659387897596882200
-            command:
-              - /bin/sh
-              - -c
-            # NOTE: Needed to insert a custom entrypoint here because the existing entrypoint.sh has a strong assumption that
-            # you use just username/password auth, which we can't do because we require 2FA (i.e. OTP).
-            # Original entrypoint here: https://external-secrets.io/v0.8.5/examples/bitwarden/
-            args:
-              - |
-                bw config server ${BW_HOST}
-
-                BW_CLIENTID=${BW_CLIENTID} BW_CLIENTSECRET=${BW_CLIENTSECRET} bw login --apikey
-
-                export BW_SESSION=$(bw unlock ${BW_PASSWORD} --raw)
-
-                bw unlock --check
-
-                echo 'Running `bw server` on port 8087'
-                bw serve --hostname 0.0.0.0
-            envFrom:
-              - secretRef:
-                  name: bitwarden-cli
-            probes:
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  exec:
-                    command:
-                      - sh
-                      - -c
-                      - /healthcheck.sh
-                  initialDelaySeconds: 20
-                  failureThreshold: 5
-                  timeoutSeconds: 3
-                  periodSeconds: 240
-            resources:
-              requests:
-                memory: 256Mi
-                cpu: 100m
-              limits:
-                memory: 512Mi
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: false
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
+              repository: ghcr.io/ripplefcl/bws-cache
+              tag: v1.1.0@sha256:bcee868971c14cf9180249059c386706b8ab2ad3f3749762006aa261f6490744
+            env:
+              SECRET_TTL: 3600
+              DEBUG: "true"
+              ORG_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: bws-secret
+                    key: ORG_ID
+            # probes:
+            #   liveness:
+            #     enabled: false
+            # #     custom: false
+            # #     spec:
+            # #       httpGet:
+            # #         path: /heartbeat
+            # #         port: 5000
+            # #       initialDelaySeconds: 15
+            # #       periodSeconds: 30
+            # #       failureThreshold: 3
+            #   readiness:
+            #     enabled: false
+            # #     custom: true
+            # #     spec:
+            # #       httpGet:
+            # #         path: /health
+            # #         port: 5000
+            # #       initialDelaySeconds: 15
+            #   startup:
+            #     enabled: false
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
     service:
       app:
         controller: *app
         ports:
           http:
-            port: 8087
+            port: 5000
