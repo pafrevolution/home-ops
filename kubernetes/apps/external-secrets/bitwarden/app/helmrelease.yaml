@@ -3,13 +3,10 @@ kind: HelmRelease
 metadata:
   name: &app bitwarden-secrets-manager
 spec:
+  chartRef:
+    kind: OCIRepository
+    name: bitwarden-secret-manager
   interval: 30m
-  chart:
-    spec:
-      chartRef:
-        kind: OCIRepository
-        name: bitwarden-secret-manager
-      interval: 30m
   install:
     remediation:
       retries: 3
