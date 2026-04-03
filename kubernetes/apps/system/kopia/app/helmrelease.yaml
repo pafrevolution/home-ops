@@ -52,11 +52,7 @@ spec:
               - -c
             args:
               - |
-                if [ ! -f /repository/kopia.repository ]; then
-                  echo "Initializing Kopia repository..."
-                  kopia repository create filesystem --path=/repository --password="$KOPIA_PASSWORD" 2>&1
-                fi
-                exec kopia server --without-password
+                exec kopia server
             probes:
               liveness:
                 enabled: true
