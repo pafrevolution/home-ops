@@ -52,7 +52,7 @@ spec:
               - -c
             args:
               - |
-                exec kopia server
+                exec kopia server start --without-password
             probes:
               liveness:
                 enabled: true
