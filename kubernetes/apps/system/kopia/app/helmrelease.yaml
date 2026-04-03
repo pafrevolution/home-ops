@@ -43,6 +43,7 @@ spec:
             env:
               KOPIA_WEB_ENABLED: true
               KOPIA_WEB_PORT: &port 8080
+              KOPIA_AUTOSTART: "true"
             envFrom:
               - secretRef:
                   name: kopia-secret
