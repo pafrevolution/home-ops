@@ -43,6 +43,7 @@ spec:
             env:
               KOPIA_WEB_ENABLED: true
               KOPIA_WEB_PORT: &port 8080
+              KOPIA_CHECKPOINT_INTERVAL_SEC: "30"
             envFrom:
               - secretRef:
                   name: kopia-secret
@@ -53,7 +54,7 @@ spec:
               - |
                 if [ ! -f /repository/kopia.repository ]; then
                   echo "Initializing Kopia repository..."
-                  kopia repository create filesystem --path=/repository --password=${KOPIA_PASSWORD} || true
+                  kopia repository create filesystem --path=/repository --password="$KOPIA_PASSWORD" 2>&1
                 fi
                 exec kopia server --without-password
             probes:
