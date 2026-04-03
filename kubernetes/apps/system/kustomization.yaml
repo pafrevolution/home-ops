@@ -7,4 +7,4 @@ components:
   - ../../components/flux-alerts
 resources:
   - ./namespace.yaml
-  # - ./volsync/ks.yaml
+  - ./volsync/ks.yaml
