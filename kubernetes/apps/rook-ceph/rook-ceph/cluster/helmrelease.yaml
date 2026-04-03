@@ -18,13 +18,14 @@ spec:
       enabled: true
     route:
       dashboard:
-        host:
-          name: rook.${SECRET_DOMAIN}
-          path: /
-          pathType: PathPrefix
+        hostnames: ["rook.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
             namespace: network
+            sectionName: "https"
+        rules:
+          - backendRefs:
+              - identifier: dashboard
     cephClusterSpec:
       cephConfig:
         global:
@@ -74,7 +75,7 @@ spec:
       storage:
         useAllNodes: true
         useAllDevices: false
-        devicePathFilter: dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NS0Y216373J_.*
+        devicePathFilter: /dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NS0Y216373J_.*
         config:
           osdsPerDevice: "1"
     cephBlockPools:
