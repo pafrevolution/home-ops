@@ -42,17 +42,13 @@ spec:
               tag: 0.22.3@sha256:17ab64542280197a5368247deaefadc3e3bbe15714ab666c2455a06824e86efd
             env:
               KOPIA_WEB_ENABLED: true
-              KOPIA_WEB_PORT: &port 8080
-              KOPIA_CHECKPOINT_INTERVAL_SEC: "30"
+              KOPIA_WEB_PORT: &port 80
+              TZ: America/New_York
             envFrom:
               - secretRef:
                   name: kopia-secret
-            command:
-              - /bin/sh
-              - -c
             args:
-              - |
-                exec kopia server start --without-password
+              - --without-password
             probes:
               liveness:
                 enabled: true
