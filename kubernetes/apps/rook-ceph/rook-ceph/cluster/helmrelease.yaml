@@ -61,6 +61,8 @@ spec:
         allowMultiplePerNode: true
       network:
         provider: host
+        addressRanges:
+          publicNet: 10.0.11.0/24
         connections:
           requireMsgr2: true
       resources:
