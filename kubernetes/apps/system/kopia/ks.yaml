@@ -19,8 +19,9 @@ spec:
   interval: 1h
   path: "./kubernetes/apps/system/kopia/app"
   postBuild:
-    substitute:
-      APP: kopia
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
   prune: true
   sourceRef:
     kind: GitRepository
