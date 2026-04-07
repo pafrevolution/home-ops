@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: system
 components:
   - ../../components/flux-alerts
+  - ../../components/sops
 resources:
   - ./namespace.yaml
   - ./kopia/ks.yaml
