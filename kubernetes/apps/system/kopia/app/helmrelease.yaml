@@ -113,9 +113,12 @@ spec:
                 subPath: tmp
     route:
       app:
-        hostnames:
-          - kopia.${SECRET_DOMAIN}
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
