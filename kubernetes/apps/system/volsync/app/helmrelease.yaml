@@ -12,7 +12,7 @@ spec:
   values:
     fullnameOverride: volsync
     image: &image
-      repository: ghcr.io/home-operations/volsync
+      repository: ghcr.io/perfectra1n/volsync
       tag: v0.17.11
     kopia: *image
     rclone: *image
