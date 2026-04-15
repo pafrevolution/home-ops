@@ -35,27 +35,40 @@ spec:
                   secretKeyRef:
                     name: bws-secret
                     key: ORG_ID
-            # probes:
-            #   liveness:
-            #     enabled: false
-            # #     custom: false
-            # #     spec:
-            # #       httpGet:
-            # #         path: /heartbeat
-            # #         port: 5000
-            # #       initialDelaySeconds: 15
-            # #       periodSeconds: 30
-            # #       failureThreshold: 3
-            #   readiness:
-            #     enabled: false
-            # #     custom: true
-            # #     spec:
-            # #       httpGet:
-            # #         path: /health
-            # #         port: 5000
-            # #       initialDelaySeconds: 15
-            #   startup:
-            #     enabled: false
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /heartbeat
+                    port: 5000
+                  initialDelaySeconds: 15
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 5000
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 5000
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 30
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
