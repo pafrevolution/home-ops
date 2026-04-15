@@ -27,7 +27,7 @@ spec:
   matchConditions:
     - name: has-volsync-job-name-prefix
       expression: >-
-        object.metadata.name.startsWith("volsync-src-")
+        object.metadata.name.startsWith("volsync-src-") || object.metadata.name.startsWith("volsync-dst-")
     - name: has-volsync-created-by-labels
       expression: >-
         object.metadata.?labels["app.kubernetes.io/created-by"].orValue("") == "volsync"
@@ -49,6 +49,31 @@ spec:
                 image: "docker.io/library/busybox:latest",
                 imagePullPolicy: "IfNotPresent",
                 command: ["sh", "-c", "sleep $(shuf -i 0-30 -n 1)"]
+              }
+            },
+            JSONPatch{
+              op: "add", path: "/spec/template/spec/volumes",
+              value: []
+            },
+            JSONPatch{
+              op: "add", path: "/spec/template/spec/volumes/-",
+              value: Object.spec.template.spec.volumes{
+                name: "kopia-repository",
+                nfs: Object.spec.template.spec.volumes.nfs{
+                  server: "10.0.0.123",
+                  path: "/volume2/Media/backup/volsync"
+                }
+              }
+            },
+            JSONPatch{
+              op: "add", path: "/spec/template/spec/containers/0/volumeMounts",
+              value: []
+            },
+            JSONPatch{
+              op: "add", path: "/spec/template/spec/containers/0/volumeMounts/-",
+              value: Object.spec.template.spec.containers.volumeMounts{
+                name: "kopia-repository",
+                mountPath: "/mnt/repository"
               }
             }
           ]
