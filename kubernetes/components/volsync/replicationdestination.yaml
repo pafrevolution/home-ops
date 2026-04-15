@@ -5,7 +5,7 @@ kind: ReplicationDestination
 metadata:
   name: "${APP}-dst"
   labels:
-    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+    kustomize.toolkit.fluxcd.io/ssa: Override
 spec:
   trigger:
     manual: restore-once
