@@ -40,8 +40,7 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
-                    path: /heartbeat
+                  tcpSocket:
                     port: 5000
                   initialDelaySeconds: 15
                   periodSeconds: 30
@@ -51,8 +50,7 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
-                    path: /health
+                  tcpSocket:
                     port: 5000
                   initialDelaySeconds: 15
                   periodSeconds: 10
@@ -62,8 +60,7 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
-                    path: /health
+                  tcpSocket:
                     port: 5000
                   initialDelaySeconds: 10
                   periodSeconds: 10
