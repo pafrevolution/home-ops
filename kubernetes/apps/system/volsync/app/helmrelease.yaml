@@ -10,9 +10,9 @@ spec:
     name: volsync
   interval: 30m
   values:
-    fullnameOverride: volsync # Required for volsync-perfectra1n fork
+    fullnameOverride: volsync
     image: &image
-      repository: ghcr.io/perfectra1n/volsync
+      repository: ghcr.io/home-operations/volsync
       tag: v0.17.11
     kopia: *image
     rclone: *image
