@@ -21,7 +21,7 @@ spec:
               tag: 1.43.0.10492@sha256:8cb062f2b0660bd7811387e6c799da0ce5f18112078fe21485c11adcc83a9c1c
             env:
               TZ: America/New_York
-              PLEX_ADVERTISE_URL: https://plex.${SECRET_DOMAIN}:443,http://plex.default.svc.cluster.local:32400
+              PLEX_ADVERTISE_URL: https://plex.${SECRET_DOMAIN}:443,http://plex.media.svc.cluster.local:32400
               PLEX_NO_AUTH_NETWORKS: 10.0.0.0/24
             probes:
               liveness:
@@ -50,16 +50,16 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
-            #   claims:
-            #     - name: gpu
+              claims:
+                - name: gpu
               requests:
                 cpu: 100m
               limits:
                 memory: 16Gi
     defaultPodOptions:
-      # resourceClaims:
-      #   - name: gpu
-      #     resourceClaimTemplateName: plex
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: plex
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
