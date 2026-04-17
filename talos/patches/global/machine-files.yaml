@@ -1,6 +1,6 @@
 machine:
   files:
-    - op: create
+    - op: overwrite
       path: /etc/cri/conf.d/20-customization.part
       content: |
         [plugins."io.containerd.cri.v1.images"]
